@@ -14,7 +14,6 @@ const randomInteger = (min, max) => {
 }
 
 const getColor = (count) => {
-    console.log(count)
     switch (count) {
         case 0:
             return `${COLOR}, 0`
