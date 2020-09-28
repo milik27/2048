@@ -1,5 +1,6 @@
 const root = document.querySelector('#root')
 const btnStart = document.querySelector('.js-start')
+const COLOR = '120,50,1'
 let field = [
     [0, 0, 0, 0],
     [0, 0, 0, 0],
@@ -12,9 +13,39 @@ const randomInteger = (min, max) => {
     return Math.floor(rand);
 }
 
+const getColor = (count) => {
+    console.log(count)
+    switch (count) {
+        case 0:
+            return `${COLOR}, 0`
+        case 2:
+            return `${COLOR}, 0.1`
+        case 4:
+            return `${COLOR}, 0.2`
+        case 8:
+            return `${COLOR}, 0.3`
+        case 16:
+            return `${COLOR}, 0.4`
+        case 32:
+            return `${COLOR}, 0.5`
+        case 64:
+            return `${COLOR}, 0.6`
+        case 128:
+            return `${COLOR}, 0.7`
+        case 256:
+            return `${COLOR}, 0.8`
+        case 512:
+            return `${COLOR}, 0.9`
+        case 1024:
+            return `${COLOR}, 1`
+        default:
+            return '255,23,91,1'
+    }
+}
+
 const print = () => {
     root.innerHTML = field.reduce((sumRow, row) => {
-        const res = row.reduce((sumCell, cell) => (sumCell + `<div class="cell">${cell ? cell : ''}</div>`), '')
+        const res = row.reduce((sumCell, cell) => (sumCell + `<div style="background-color: rgba(${getColor(cell)})" class="cell">${cell ? cell : ''}</div>`), '')
         return sumRow + `<div class="row">${res}</div>`
     }, '')
 }
