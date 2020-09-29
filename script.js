@@ -46,6 +46,7 @@ const getColor = (count) => {
 const print = () => {
     if (gameOver) {
         root.innerHTML = `<h1>GAME OVER</h1>`
+        return false
     }
     root.innerHTML = field.reduce((sumRow, row) => {
         const res = row.reduce((sumCell, cell) => (sumCell + `<div style="background-color: rgba(${getColor(cell)})" class="cell">${cell ? cell : ''}</div>`), '')
