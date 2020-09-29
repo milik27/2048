@@ -7,6 +7,7 @@ let field = [
     [0, 0, 0, 0],
     [0, 0, 0, 0]
 ]
+let gameOver = false
 
 const randomInteger = (min, max) => {
     let rand = min + Math.random() * (max + 1 - min);
@@ -43,6 +44,9 @@ const getColor = (count) => {
 }
 
 const print = () => {
+    if (gameOver) {
+        root.innerHTML = `<h1>GAME OVER</h1>`
+    }
     root.innerHTML = field.reduce((sumRow, row) => {
         const res = row.reduce((sumCell, cell) => (sumCell + `<div style="background-color: rgba(${getColor(cell)})" class="cell">${cell ? cell : ''}</div>`), '')
         return sumRow + `<div class="row">${res}</div>`
@@ -142,9 +146,15 @@ const moveCell = side => {
             }
         }
     }
-    if (isMove) randomNewCell()
+    if (isMove) {
+        if (randomInteger(1, 20) === 20) {
+            gameOver = true
+        }
+        randomNewCell()
+    }
 
     print()
+
 }
 
 // event arrow key press
@@ -163,6 +173,7 @@ document.addEventListener('keydown', e => {
 
 // start game
 btnStart.addEventListener('click', () => {
+    gameOver = false
     field = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
