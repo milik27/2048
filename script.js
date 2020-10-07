@@ -84,97 +84,100 @@ const randomNewCell = (count = 1) => {
 }
 
 //
-const moveCell = side => {
-    let isMove = false
-    if (side === 'down' || side === 'right') {
-        field.forEach((row, i) => {
-            row.forEach((cell, j) => {
-                if (side === 'down') {
-                    if (cell !== 0 && i < field.length - 1) {
-                        if (field[i + 1][j] === 0) {
-                            field[i][j] = 0
-                            field[i + 1][j] = cell
-                            isMove = true
-                        } else if(field[i + 1][j] === cell) {
-                            field[i][j] = 0
-                            field[i + 1][j] = cell * 2
-                            isMove = true
-                        }
-                    }
-                } else {
-                    if (cell !== 0 && j < row.length - 1) {
-                        if (field[i][j + 1] === 0) {
-                            field[i][j] = 0
-                            field[i][j + 1] = cell
-                            isMove = true
-                        } else if (field[i][j + 1] === cell) {
-                            field[i][j] = 0
-                            field[i][j + 1] = cell * 2
-                            isMove = true
-                        }
-                    }
-                }
-            })
-        })
-    } else {
-        for (let i = field.length - 1; i >= 0; i--) {
-            for(let j = field[i].length - 1; j >= 0; j--) {
-                if (side === 'up') {
-                    if (field[i][j] !== 0 && i > 0) {
-                        if (field[i - 1][j] === 0) {
-                            field[i - 1][j] = field[i][j]
-                            field[i][j] = 0
-                            isMove = true
-                        } else if (field[i -1][j] === field[i][j]) {
-                            field[i -1][j] = field[i][j] * 2
-                            field[i][j] = 0
-                            isMove = true
-                        }
-                    }
-                } else {
-                    if (field[i][j] !== 0 && j > 0) {
-                        if (field[i][j - 1] === 0) {
-                            field[i][j - 1] = field[i][j]
-                            field[i][j] = 0
-                            isMove = true
-                        } else if (field[i][j - 1] === field[i][j]) {
-                            field[i][j - 1] = field[i][j] * 2
-                            field[i][j] = 0
-                            isMove = true
-                        }
-                    }
-                }
-            }
+//todo refactor arr links
+const sumCell = row => {
+    let newRow = row.filter(count => !!count)
+    newRow.forEach((cell, i) => {
+        if (i + 1 < newRow.length && cell === newRow[i + 1]) {
+            newRow[i] = cell * 2
+            newRow[i + 1] = 0
         }
+    })
+    newRow = newRow.filter(count => !!count)
+    for (let i = newRow.length; i < row.length; i++) {
+        newRow.push(0)
     }
-    if (isMove) {
-        if (randomInteger(1, 20) === 20) {
-            gameOver = true
-        }
-        randomNewCell()
+    return newRow
+}
+
+//
+const createNewField = (side, arr) => {
+    let newField = arr.map(row => row.map(cell => cell))
+    if (side === 'down' || side === 'up') {
+        arr[arr.length - 1].forEach((cell, j) => {
+            let newRow
+            if (side === 'down') {
+                newRow = sumCell(arr.map(row => row[j]).reverse()).reverse()
+            } else {
+                newRow = sumCell(arr.map(row => row[j]))
+            }
+            for (let i = arr.length - 1; i >= 0; i--) {
+                newField[i][j] = newRow[i]
+            }
+        })
+    } else if (side === 'left' || side === 'right') {
+        arr.forEach((row, i) => {
+            if (side === 'left') {
+                newField[i] = [...sumCell(row)]
+            } else {
+
+                newField[i] = [...sumCell(row.reverse()).reverse()]
+            }
+        })
     }
 
-    print()
+    return newField
+}
+
+const checkGameOver = () => {
+    const check = (newField2) => {
+        return newField2.join() !== field.join();
+    }
+    let checkField
+    checkField = createNewField('down', field)
+    if (check(checkField)) return false
+
+    console.log(1)
+    checkField = createNewField('up', field)
+    if (check(checkField)) return false
+
+    console.log(2)
+    checkField = createNewField('left', field)
+    if (check(checkField)) return false
+
+    console.log(3)
+    checkField = createNewField('right', field)
+    if (check(checkField)) return false
+    console.log(123)
+    gameOver = true
 
 }
 
 // event arrow key press
 document.addEventListener('keydown', e => {
-    const { code } = e
+    const {code} = e
+    let newField
     if (code === 'ArrowDown' || code === 'KeyS') {
-        moveCell('down')
+        newField = createNewField('down', field)
     } else if (code === 'ArrowRight' || code === 'KeyD') {
-        moveCell('right')
+        newField = createNewField('right', field)
     } else if (code === 'ArrowUp' || code === 'KeyW') {
-        moveCell('up')
+        newField = createNewField('up', field)
     } else if (code === 'ArrowLeft' || code === 'KeyA') {
-        moveCell('left')
+        newField = createNewField('left', field)
+    }
+
+//todo refactor arr links
+    if (newField && field.join() !== newField.join()) {
+        field = newField.map(row => row.map(cell => cell))
+        randomNewCell()
+        print()
+        checkGameOver()
     }
 })
 
 // start game
 btnStart.addEventListener('click', () => {
-    gameOver = false
     field = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
@@ -183,5 +186,8 @@ btnStart.addEventListener('click', () => {
     ]
     randomNewCell(2)
 })
+
+
+
 
 print()
